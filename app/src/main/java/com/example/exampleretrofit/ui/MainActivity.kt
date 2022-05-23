@@ -2,73 +2,51 @@ package com.example.exampleretrofit.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
+import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.exampleretrofit.core.RetrofitHelper
-import com.example.exampleretrofit.data.model.DogsResponse
-import com.example.exampleretrofit.data.network.DogsApiService
 import com.example.exampleretrofit.databinding.ActivityMainBinding
-import com.example.exampleretrofit.ui.rosterDogs.RosterDogsAdapter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.exampleretrofit.ui.view.rosterDogs.RosterDogsAdapter
+import com.example.exampleretrofit.ui.viewmodel.DogsByBreedViewModel
 
 class MainActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView.OnQueryTextListener {
 
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var dogImages: List<String>
-    private lateinit var dogsAdapter: RosterDogsAdapter
+    private val dogsByBreedViewModel: DogsByBreedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.svDogs.setOnQueryTextListener(this)
-    }
+        binding.pbLoading.isVisible = false
 
-    private fun searchByName(query: String) {
-        val retrofit = RetrofitHelper.getRetrofit()
-        CoroutineScope(Dispatchers.IO).launch {
-            val call = retrofit
-                .create(DogsApiService::class.java)
-                .getDogsByBreeds("$query/images")
-            val imagesResult = call.body()
-
-            runOnUiThread {
-                if (imagesResult?.status == "success") {
-                    initCharacter(imagesResult)
-                } else {
-                    showError("Error")
-                }
-            }
-        }
-    }
-
-    private fun initCharacter(imagesResult: DogsResponse) {
-        dogImages =
-            if (imagesResult.status == "success") imagesResult.images
-            else listOf("A", "B")
-        dogsAdapter = RosterDogsAdapter(dogImages)
+        val adapter = RosterDogsAdapter(layoutInflater)
         binding.rvDogs.apply {
+            setAdapter(adapter)
             layoutManager = LinearLayoutManager(context)
-            adapter = dogsAdapter
-            setHasFixedSize(true)
         }
-    }
 
-    private fun showError(s: String) {
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show()
+        dogsByBreedViewModel.dogsImages.observe(this) { currentDog ->
+            adapter.submitList(currentDog)
+        }
+        dogsByBreedViewModel.loading.observe(this) { loadingStatus ->
+            binding.pbLoading.isVisible = loadingStatus
+        }
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        if (!query.isNullOrEmpty()) {
-            searchByName(query = query.lowercase())
-        }
+        dogsByBreedViewModel.onCreate(query = query ?: "")
+        hideKeyboard()
         return true
     }
 
     override fun onQueryTextChange(p0: String?): Boolean = true
 
-
+    private fun hideKeyboard() {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.vrDogs.windowToken, 0)
+    }
 }
