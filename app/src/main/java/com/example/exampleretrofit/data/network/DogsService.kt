@@ -4,14 +4,14 @@ import com.example.exampleretrofit.core.RetrofitHelper
 import com.example.exampleretrofit.data.model.DogsResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class DogsService {
-    private val retrofit = RetrofitHelper.getRetrofit()
+class DogsService @Inject constructor(
+    private val api: DogsApiService
+) {
 
     suspend fun getDogByBreed(query: String): DogsResponse? = withContext(Dispatchers.IO) {
-        val response = retrofit
-            .create(DogsApiService::class.java)
-            .getDogsByBreeds("$query/images")
+        val response = api.getDogsByBreeds("$query/images")
         response.body()
     }
 }

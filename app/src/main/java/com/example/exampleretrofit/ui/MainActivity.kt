@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.exampleretrofit.databinding.ActivityMainBinding
 import com.example.exampleretrofit.ui.view.rosterDogs.RosterDogsAdapter
 import com.example.exampleretrofit.ui.viewmodel.DogsByBreedViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView.OnQueryTextListener {
 
     private lateinit var binding: ActivityMainBinding
