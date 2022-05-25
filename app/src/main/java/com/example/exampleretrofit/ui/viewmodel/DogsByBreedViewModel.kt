@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.exampleretrofit.domain.GetDogByBreedUseCase
 import kotlinx.coroutines.launch
 
-class DogsByBreedViewModel : ViewModel() {
+class DogsByBreedViewModel(
+    private val getDogByBreedUseCase: GetDogByBreedUseCase
+) : ViewModel() {
     val dogsImages = MutableLiveData<List<String>>()
-    val getDogByBreedUseCase = GetDogByBreedUseCase()
-
     val loading = MutableLiveData<Boolean>()
 
     fun onCreate(query: String) {

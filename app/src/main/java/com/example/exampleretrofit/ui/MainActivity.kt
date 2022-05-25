@@ -3,18 +3,18 @@ package com.example.exampleretrofit.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.exampleretrofit.databinding.ActivityMainBinding
 import com.example.exampleretrofit.ui.view.rosterDogs.RosterDogsAdapter
 import com.example.exampleretrofit.ui.viewmodel.DogsByBreedViewModel
+import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView.OnQueryTextListener {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val dogsByBreedViewModel: DogsByBreedViewModel by viewModels()
+    private val dogsByBreedViewModel by inject<DogsByBreedViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
